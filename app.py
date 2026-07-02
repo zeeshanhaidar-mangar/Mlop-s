@@ -4,12 +4,13 @@ import joblib
 import numpy as np
 from flask import Flask, request, jsonify, render_template
 
-app = Flask(__name__)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+app = Flask(__name__, template_folder=os.path.join(BASE_DIR, 'templates'))
 
 # Paths to saved models
-MODEL_PATH = os.path.join('models', 'RandomForest.pkl')
-SCALER_PATH = os.path.join('models', 'scaler.pkl')
-ENCODER_PATH = os.path.join('models', 'label_encoder.pkl')
+MODEL_PATH = os.path.join(BASE_DIR, 'models', 'RandomForest.pkl')
+SCALER_PATH = os.path.join(BASE_DIR, 'models', 'scaler.pkl')
+ENCODER_PATH = os.path.join(BASE_DIR, 'models', 'label_encoder.pkl')
 
 # Load the models
 try:
