@@ -18,33 +18,26 @@ def home():
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    try:
-        data = request.get_json()
+    data = request.get_json()
 
-        features = np.array([[
-            float(data['sepal_length']),
-            float(data['sepal_width']),
-            float(data['petal_length']),
-            float(data['petal_width'])
-        ]])
+    features = np.array([[
+        float(data['sepal_length']),
+        float(data['sepal_width']),
+        float(data['petal_length']),
+        float(data['petal_width'])
+    ]])
 
-        features_scaled = scaler.transform(features)
+    features_scaled = scaler.transform(features)
 
-        pred = model.predict(features_scaled)[0]
-        label = label_encoder.inverse_transform([pred])[0]
+    pred = model.predict(features_scaled)[0]
+    label = label_encoder.inverse_transform([pred])[0]
 
-        return jsonify({
-            "success": True,
-            "prediction": label
-        })
+    return jsonify({
+        "success": True,
+        "prediction": label
+    })
 
-    except Exception as e:
-        return jsonify({
-            "success": False,
-            "error": str(e)
-        })
 
-# IMPORTANT FOR RENDER
+# IMPORTANT: DO NOT set port manually
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0")
