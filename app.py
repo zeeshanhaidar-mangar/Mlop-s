@@ -1,43 +1,35 @@
 import os
 import joblib
 import numpy as np
-from flask import Flask, request, jsonify, render_template
+import streamlit as st
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-app = Flask(__name__, template_folder=os.path.join(BASE_DIR, 'templates'))
-
+# Load models
 model = joblib.load(os.path.join(BASE_DIR, 'models', 'RandomForest.pkl'))
 scaler = joblib.load(os.path.join(BASE_DIR, 'models', 'scaler.pkl'))
 label_encoder = joblib.load(os.path.join(BASE_DIR, 'models', 'label_encoder.pkl'))
 
-@app.route('/')
-def home():
-    return render_template('index.html')
+# UI
+st.set_page_config(page_title="Iris Classifier", layout="centered")
 
-@app.route('/predict', methods=['POST'])
-def predict():
-    data = request.get_json()
+st.title("🌸 Iris Classification App")
 
-    features = np.array([[
-        float(data['sepal_length']),
-        float(data['sepal_width']),
-        float(data['petal_length']),
-        float(data['petal_width'])
-    ]])
+st.write("Enter flower measurements below:")
+
+# Inputs
+sepal_length = st.number_input("Sepal Length", min_value=0.0)
+sepal_width = st.number_input("Sepal Width", min_value=0.0)
+petal_length = st.number_input("Petal Length", min_value=0.0)
+petal_width = st.number_input("Petal Width", min_value=0.0)
+
+# Predict
+if st.button("Predict"):
+    features = np.array([[sepal_length, sepal_width, petal_length, petal_width]])
 
     features_scaled = scaler.transform(features)
 
-    pred = model.predict(features_scaled)[0]
-    label = label_encoder.inverse_transform([pred])[0]
+    prediction = model.predict(features_scaled)[0]
+    label = label_encoder.inverse_transform([prediction])[0]
 
-    return jsonify({"success": True, "prediction": label})
-
-
-# 🔥 FIX: prevent duplicate execution + avoid port conflict
-if __name__ == "__main__":
-    import sys
-
-    # If Streamlit is running it, DON'T start Flask server
-    if "streamlit" not in sys.modules:
-        app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8000)))
+    st.success(f"Prediction: {label}")
