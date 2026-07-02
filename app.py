@@ -1,4 +1,5 @@
 import os
+import socket
 import joblib
 import numpy as np
 from flask import Flask, request, jsonify, render_template
@@ -53,11 +54,23 @@ def predict():
             'error': str(e)
         })
 
+def find_available_port(start_port=5000):
+    port = start_port
+    while True:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            try:
+                s.bind(('0.0.0.0', port))
+                return port
+            except OSError:
+                port += 1
+
+
 if __name__ == '__main__':
+    port = int(os.environ.get('PORT', find_available_port()))
     app.run(
         host='0.0.0.0',
-        port=int(os.environ.get('PORT', 5000)),
+        port=port,
         debug=False,
         use_reloader=False
     )
-
