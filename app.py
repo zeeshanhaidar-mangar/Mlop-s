@@ -1,35 +1,24 @@
 import os
-import joblib
-import numpy as np
 import streamlit as st
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+st.title("🔥 Debug Mode App")
 
-# Load models
-model = joblib.load(os.path.join(BASE_DIR, 'models', 'RandomForest.pkl'))
-scaler = joblib.load(os.path.join(BASE_DIR, 'models', 'scaler.pkl'))
-label_encoder = joblib.load(os.path.join(BASE_DIR, 'models', 'label_encoder.pkl'))
+st.write("Step 1: App started successfully")
 
-# UI
-st.set_page_config(page_title="Iris Classifier", layout="centered")
+BASE_DIR = os.path.dirname(__file__)
+st.write("Step 2: Base directory loaded")
 
-st.title("🌸 Iris Classification App")
+try:
+    import joblib
+    import numpy as np
 
-st.write("Enter flower measurements below:")
+    st.write("Step 3: Libraries loaded")
 
-# Inputs
-sepal_length = st.number_input("Sepal Length", min_value=0.0)
-sepal_width = st.number_input("Sepal Width", min_value=0.0)
-petal_length = st.number_input("Petal Length", min_value=0.0)
-petal_width = st.number_input("Petal Width", min_value=0.0)
+    model = joblib.load(os.path.join(BASE_DIR, "models", "RandomForest.pkl"))
+    scaler = joblib.load(os.path.join(BASE_DIR, "models", "scaler.pkl"))
+    label_encoder = joblib.load(os.path.join(BASE_DIR, "models", "label_encoder.pkl"))
 
-# Predict
-if st.button("Predict"):
-    features = np.array([[sepal_length, sepal_width, petal_length, petal_width]])
+    st.success("Step 4: Models loaded successfully")
 
-    features_scaled = scaler.transform(features)
-
-    prediction = model.predict(features_scaled)[0]
-    label = label_encoder.inverse_transform([prediction])[0]
-
-    st.success(f"Prediction: {label}")
+except Exception as e:
+    st.error(f"ERROR DURING LOAD: {e}")
