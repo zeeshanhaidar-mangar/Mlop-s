@@ -1,5 +1,4 @@
-flask
+streamlit
 numpy
 scikit-learn==1.8.0
 joblib
-gunicorn
