@@ -7,7 +7,6 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 app = Flask(__name__, template_folder=os.path.join(BASE_DIR, 'templates'))
 
-# Load models
 model = joblib.load(os.path.join(BASE_DIR, 'models', 'RandomForest.pkl'))
 scaler = joblib.load(os.path.join(BASE_DIR, 'models', 'scaler.pkl'))
 label_encoder = joblib.load(os.path.join(BASE_DIR, 'models', 'label_encoder.pkl'))
@@ -32,12 +31,13 @@ def predict():
     pred = model.predict(features_scaled)[0]
     label = label_encoder.inverse_transform([pred])[0]
 
-    return jsonify({
-        "success": True,
-        "prediction": label
-    })
+    return jsonify({"success": True, "prediction": label})
 
 
-# IMPORTANT: DO NOT set port manually
+# 🔥 FIX: prevent duplicate execution + avoid port conflict
 if __name__ == "__main__":
-    app.run(host="0.0.0.0")
+    import sys
+
+    # If Streamlit is running it, DON'T start Flask server
+    if "streamlit" not in sys.modules:
+        app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
